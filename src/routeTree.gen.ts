@@ -12,8 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppSettingsRouteImport } from './routes/_app/settings'
+import { Route as AppInvoicesRouteImport } from './routes/_app/invoices'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCustomersRouteImport } from './routes/_app/customers'
+import { Route as AppQuotesIndexRouteImport } from './routes/_app/quotes/index'
+import { Route as AppQuotesNewRouteImport } from './routes/_app/quotes/new'
+import { Route as AppQuotesIdRouteImport } from './routes/_app/quotes/$id'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -29,6 +34,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInvoicesRoute = AppInvoicesRouteImport.update({
+  id: '/invoices',
+  path: '/invoices',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -39,18 +54,43 @@ const AppCustomersRoute = AppCustomersRouteImport.update({
   path: '/customers',
   getParentRoute: () => AppRoute,
 } as any)
+const AppQuotesIndexRoute = AppQuotesIndexRouteImport.update({
+  id: '/quotes/',
+  path: '/quotes/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppQuotesNewRoute = AppQuotesNewRouteImport.update({
+  id: '/quotes/new',
+  path: '/quotes/new',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppQuotesIdRoute = AppQuotesIdRouteImport.update({
+  id: '/quotes/$id',
+  path: '/quotes/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/customers': typeof AppCustomersRoute
   '/dashboard': typeof AppDashboardRoute
+  '/invoices': typeof AppInvoicesRoute
+  '/settings': typeof AppSettingsRoute
+  '/quotes/$id': typeof AppQuotesIdRoute
+  '/quotes/new': typeof AppQuotesNewRoute
+  '/quotes/': typeof AppQuotesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/customers': typeof AppCustomersRoute
   '/dashboard': typeof AppDashboardRoute
+  '/invoices': typeof AppInvoicesRoute
+  '/settings': typeof AppSettingsRoute
+  '/quotes/$id': typeof AppQuotesIdRoute
+  '/quotes/new': typeof AppQuotesNewRoute
+  '/quotes': typeof AppQuotesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -59,12 +99,35 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_app/customers': typeof AppCustomersRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/invoices': typeof AppInvoicesRoute
+  '/_app/settings': typeof AppSettingsRoute
+  '/_app/quotes/$id': typeof AppQuotesIdRoute
+  '/_app/quotes/new': typeof AppQuotesNewRoute
+  '/_app/quotes/': typeof AppQuotesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/customers' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/customers'
+    | '/dashboard'
+    | '/invoices'
+    | '/settings'
+    | '/quotes/$id'
+    | '/quotes/new'
+    | '/quotes/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/customers' | '/dashboard'
+  to:
+    | '/'
+    | '/login'
+    | '/customers'
+    | '/dashboard'
+    | '/invoices'
+    | '/settings'
+    | '/quotes/$id'
+    | '/quotes/new'
+    | '/quotes'
   id:
     | '__root__'
     | '/'
@@ -72,6 +135,11 @@ export interface FileRouteTypes {
     | '/login'
     | '/_app/customers'
     | '/_app/dashboard'
+    | '/_app/invoices'
+    | '/_app/settings'
+    | '/_app/quotes/$id'
+    | '/_app/quotes/new'
+    | '/_app/quotes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -103,6 +171,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/invoices': {
+      id: '/_app/invoices'
+      path: '/invoices'
+      fullPath: '/invoices'
+      preLoaderRoute: typeof AppInvoicesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
@@ -117,17 +199,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCustomersRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/quotes/': {
+      id: '/_app/quotes/'
+      path: '/quotes'
+      fullPath: '/quotes/'
+      preLoaderRoute: typeof AppQuotesIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/quotes/new': {
+      id: '/_app/quotes/new'
+      path: '/quotes/new'
+      fullPath: '/quotes/new'
+      preLoaderRoute: typeof AppQuotesNewRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/quotes/$id': {
+      id: '/_app/quotes/$id'
+      path: '/quotes/$id'
+      fullPath: '/quotes/$id'
+      preLoaderRoute: typeof AppQuotesIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppCustomersRoute: typeof AppCustomersRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppInvoicesRoute: typeof AppInvoicesRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppQuotesIdRoute: typeof AppQuotesIdRoute
+  AppQuotesNewRoute: typeof AppQuotesNewRoute
+  AppQuotesIndexRoute: typeof AppQuotesIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppCustomersRoute: AppCustomersRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppInvoicesRoute: AppInvoicesRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppQuotesIdRoute: AppQuotesIdRoute,
+  AppQuotesNewRoute: AppQuotesNewRoute,
+  AppQuotesIndexRoute: AppQuotesIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
