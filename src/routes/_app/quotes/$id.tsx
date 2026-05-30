@@ -40,7 +40,7 @@ function QuoteDetail() {
   if (!data?.q) return <div className="text-muted-foreground">Chargement…</div>;
   const { q, lines, company } = data;
 
-  const setStatus = async (status: string) => {
+  const setStatus = async (status: any) => {
     const { error } = await supabase.from("quotes").update({ status }).eq("id", id);
     if (error) toast.error(error.message); else { toast.success("Statut mis à jour"); qc.invalidateQueries({ queryKey: ["quote", id] }); }
   };
