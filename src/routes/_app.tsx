@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LayoutDashboard, Users, FileText, Receipt, Settings, LogOut, Menu, X, Building2 } from "lucide-react";
+import { LayoutDashboard, Users, FileText, Receipt, Settings, LogOut, Menu, X, Building2, Flame } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +24,7 @@ const NAV = [
   { to: "/customers", label: "Clients", icon: Users },
   { to: "/quotes", label: "Devis", icon: FileText },
   { to: "/invoices", label: "Factures", icon: Receipt },
+  { to: "/follow-ups", label: "Relances IA", icon: Flame },
   { to: "/settings", label: "Paramètres", icon: Settings },
 ] as const;
 
