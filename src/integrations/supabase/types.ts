@@ -109,6 +109,69 @@ export type Database = {
           },
         ]
       }
+      follow_ups: {
+        Row: {
+          channel: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          id: string
+          invoice_id: string | null
+          language: string | null
+          message: string | null
+          next_action_date: string | null
+          note: string | null
+          priority: Database["public"]["Enums"]["followup_priority"]
+          promised_date: string | null
+          quote_id: string | null
+          sent_at: string | null
+          status: Database["public"]["Enums"]["followup_status"]
+          tone: string | null
+          updated_at: string
+        }
+        Insert: {
+          channel?: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          id?: string
+          invoice_id?: string | null
+          language?: string | null
+          message?: string | null
+          next_action_date?: string | null
+          note?: string | null
+          priority?: Database["public"]["Enums"]["followup_priority"]
+          promised_date?: string | null
+          quote_id?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["followup_status"]
+          tone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          channel?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          id?: string
+          invoice_id?: string | null
+          language?: string | null
+          message?: string | null
+          next_action_date?: string | null
+          note?: string | null
+          priority?: Database["public"]["Enums"]["followup_priority"]
+          promised_date?: string | null
+          quote_id?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["followup_status"]
+          tone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           balance: number
@@ -424,6 +487,14 @@ export type Database = {
     Enums: {
       app_role: "owner" | "admin" | "sales"
       customer_status: "lead" | "active" | "inactive"
+      followup_priority: "high" | "medium" | "low"
+      followup_status:
+        | "new"
+        | "waiting"
+        | "promise"
+        | "partial"
+        | "escalated"
+        | "closed"
       invoice_status: "unpaid" | "partial" | "paid" | "overdue"
       pricing_unit: "m2" | "ml" | "piece"
       product_type:
@@ -566,6 +637,15 @@ export const Constants = {
     Enums: {
       app_role: ["owner", "admin", "sales"],
       customer_status: ["lead", "active", "inactive"],
+      followup_priority: ["high", "medium", "low"],
+      followup_status: [
+        "new",
+        "waiting",
+        "promise",
+        "partial",
+        "escalated",
+        "closed",
+      ],
       invoice_status: ["unpaid", "partial", "paid", "overdue"],
       pricing_unit: ["m2", "ml", "piece"],
       product_type: [

@@ -14,6 +14,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppInvoicesRouteImport } from './routes/_app/invoices'
+import { Route as AppFollowUpsRouteImport } from './routes/_app/follow-ups'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCustomersRouteImport } from './routes/_app/customers'
 import { Route as AppQuotesIndexRouteImport } from './routes/_app/quotes/index'
@@ -42,6 +43,11 @@ const AppSettingsRoute = AppSettingsRouteImport.update({
 const AppInvoicesRoute = AppInvoicesRouteImport.update({
   id: '/invoices',
   path: '/invoices',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFollowUpsRoute = AppFollowUpsRouteImport.update({
+  id: '/follow-ups',
+  path: '/follow-ups',
   getParentRoute: () => AppRoute,
 } as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/customers': typeof AppCustomersRoute
   '/dashboard': typeof AppDashboardRoute
+  '/follow-ups': typeof AppFollowUpsRoute
   '/invoices': typeof AppInvoicesRoute
   '/settings': typeof AppSettingsRoute
   '/quotes/$id': typeof AppQuotesIdRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/customers': typeof AppCustomersRoute
   '/dashboard': typeof AppDashboardRoute
+  '/follow-ups': typeof AppFollowUpsRoute
   '/invoices': typeof AppInvoicesRoute
   '/settings': typeof AppSettingsRoute
   '/quotes/$id': typeof AppQuotesIdRoute
@@ -99,6 +107,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_app/customers': typeof AppCustomersRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/follow-ups': typeof AppFollowUpsRoute
   '/_app/invoices': typeof AppInvoicesRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/quotes/$id': typeof AppQuotesIdRoute
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/customers'
     | '/dashboard'
+    | '/follow-ups'
     | '/invoices'
     | '/settings'
     | '/quotes/$id'
@@ -123,6 +133,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/customers'
     | '/dashboard'
+    | '/follow-ups'
     | '/invoices'
     | '/settings'
     | '/quotes/$id'
@@ -135,6 +146,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_app/customers'
     | '/_app/dashboard'
+    | '/_app/follow-ups'
     | '/_app/invoices'
     | '/_app/settings'
     | '/_app/quotes/$id'
@@ -185,6 +197,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvoicesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/follow-ups': {
+      id: '/_app/follow-ups'
+      path: '/follow-ups'
+      fullPath: '/follow-ups'
+      preLoaderRoute: typeof AppFollowUpsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
@@ -226,6 +245,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppCustomersRoute: typeof AppCustomersRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppFollowUpsRoute: typeof AppFollowUpsRoute
   AppInvoicesRoute: typeof AppInvoicesRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppQuotesIdRoute: typeof AppQuotesIdRoute
@@ -236,6 +256,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppCustomersRoute: AppCustomersRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppFollowUpsRoute: AppFollowUpsRoute,
   AppInvoicesRoute: AppInvoicesRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppQuotesIdRoute: AppQuotesIdRoute,
