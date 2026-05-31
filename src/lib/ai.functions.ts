@@ -4,10 +4,17 @@ import { z } from "zod";
 const InputSchema = z.object({
   tone: z.enum(["friendly", "firm", "final"]),
   language: z.enum(["fr", "ar", "ar_tn", "en"]),
+  kind: z.enum(["invoice", "quote"]).default("invoice"),
   customerName: z.string().min(1).max(200),
   invoiceNumber: z.string().min(1).max(100),
   amount: z.number(),
   dueDate: z.string().nullable().optional(),
+  daysOverdue: z.number().nullable().optional(),
+  partialPaid: z.number().nullable().optional(),
+  history: z
+    .array(z.object({ date: z.string(), status: z.string(), note: z.string().nullable().optional() }))
+    .max(10)
+    .optional(),
 });
 
 const LANG: Record<string, string> = {
@@ -27,13 +34,34 @@ export const generateFollowupMessage = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("AI not configured");
-    const prompt = `Write a short WhatsApp payment-reminder message in ${LANG[data.language]} for an aluminum/PVC workshop in Tunisia. Tone: ${TONE[data.tone]}.
-Customer: ${data.customerName}
-Invoice: ${data.invoiceNumber}
-Outstanding amount: ${data.amount} TND
-Due date: ${data.dueDate ?? "unspecified"}
 
-Keep it under 4 short lines. Use line breaks. Do NOT include greetings like "Subject:" or any preamble — output only the message text itself, ready to send.`;
+    const context: string[] = [];
+    context.push(`Customer: ${data.customerName}`);
+    if (data.kind === "quote") {
+      context.push(`Quote reference: ${data.invoiceNumber}`);
+      context.push(`Quote total: ${data.amount} TND`);
+      context.push(`Sent on: ${data.dueDate ?? "unspecified"}`);
+    } else {
+      context.push(`Invoice: ${data.invoiceNumber}`);
+      context.push(`Outstanding amount: ${data.amount} TND`);
+      context.push(`Due date: ${data.dueDate ?? "unspecified"}`);
+      if (data.daysOverdue != null) context.push(`Days overdue: ${data.daysOverdue}`);
+      if (data.partialPaid && data.partialPaid > 0) context.push(`Already paid: ${data.partialPaid} TND (partial payment received)`);
+    }
+    if (data.history?.length) {
+      context.push(`Previous follow-up history (most recent first):`);
+      for (const h of data.history) context.push(`- ${h.date} — ${h.status}${h.note ? `: ${h.note}` : ""}`);
+    }
+
+    const goal = data.kind === "quote"
+      ? "politely follow up on a quote that was sent but not yet accepted, and invite the customer to confirm or share feedback"
+      : "request payment of the outstanding invoice";
+
+    const prompt = `Write a short WhatsApp message in ${LANG[data.language]} for an aluminum/PVC workshop in Tunisia. Goal: ${goal}. Tone: ${TONE[data.tone]}.
+
+${context.join("\n")}
+
+Acknowledge any partial payment if mentioned. Reference prior contact briefly if history is provided. Keep it under 4 short lines. Use line breaks. Do NOT include greetings like "Subject:" or any preamble — output only the message text itself, ready to send.`;
 
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
