@@ -96,17 +96,57 @@ function Onboarding({ onDone }: { onDone: () => Promise<void> }) {
   const [busy, setBusy] = useState(false);
 
   const create = async () => {
-    if (!name.trim() || !user) return;
+    if (!name.trim()) return;
     setBusy(true);
     try {
-      const { data: company, error } = await supabase.from("companies").insert({ name, phone, address, email: user.email }).select().single();
-      if (error) throw error;
-      const { error: e2 } = await supabase.from("profiles").update({ company_id: company.id }).eq("id", user.id);
-      if (e2) throw e2;
-      await supabase.from("user_roles").insert({ user_id: user.id, company_id: company.id, role: "owner" });
+      // 1. Re-verify authenticated user
+      const { data: userData, error: userErr } = await supabase.auth.getUser();
+      if (userErr || !userData.user) {
+        console.error("[onboarding] getUser failed", userErr);
+        throw new Error("Session expirée. Reconnectez-vous.");
+      }
+      const uid = userData.user.id;
+
+      // 2. Insert company with owner_id = uid
+      const { data: company, error: companyErr } = await supabase
+        .from("companies")
+        .insert({ name, phone, address, email: userData.user.email, owner_id: uid })
+        .select()
+        .single();
+      if (companyErr || !company) {
+        console.error("[onboarding] company insert failed", companyErr);
+        throw new Error(`Création entreprise: ${companyErr?.message ?? "inconnue"}`);
+      }
+
+      // 3. Insert owner role
+      const { error: roleErr } = await supabase
+        .from("user_roles")
+        .insert({ user_id: uid, company_id: company.id, role: "owner" })
+        .select()
+        .single();
+      if (roleErr) {
+        console.error("[onboarding] user_roles insert failed", roleErr);
+        throw new Error(`Attribution rôle: ${roleErr.message}`);
+      }
+
+      // 4. Update profile.company_id
+      const { error: profileErr } = await supabase
+        .from("profiles")
+        .update({ company_id: company.id })
+        .eq("id", uid);
+      if (profileErr) {
+        console.error("[onboarding] profile update failed", profileErr);
+        throw new Error(`Mise à jour profil: ${profileErr.message}`);
+      }
+
       toast.success("Entreprise créée !");
       await onDone();
-    } catch (e: any) { toast.error(e.message); } finally { setBusy(false); }
+    } catch (e: any) {
+      console.error("[onboarding] error", e);
+      toast.error(e?.message ?? "Erreur inattendue");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
