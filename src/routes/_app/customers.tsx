@@ -92,17 +92,27 @@ function CustomersPage() {
   );
 }
 
-function CustomerDialog({ cid, editing, onSaved }: { cid: string; editing: Cust | null; onSaved: () => void }) {
-  const [f, setF] = useState({
-    name: editing?.name ?? "",
-    phone: editing?.phone ?? "",
-    whatsapp: editing?.whatsapp ?? "",
-    address: editing?.address ?? "",
-    notes: editing?.notes ?? "",
-    status: editing?.status ?? "lead",
-    risk_level: editing?.risk_level ?? "low",
-  });
+const BLANK = { name: "", phone: "", whatsapp: "", address: "", notes: "", status: "lead", risk_level: "low" };
+
+function CustomerDialog({ cid, editing, open, onSaved }: { cid: string; editing: Cust | null; open: boolean; onSaved: () => void }) {
+  const [f, setF] = useState<any>(BLANK);
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (open && editing) {
+      setF({
+        name: editing.name ?? "",
+        phone: editing.phone ?? "",
+        whatsapp: editing.whatsapp ?? "",
+        address: editing.address ?? "",
+        notes: editing.notes ?? "",
+        status: editing.status ?? "lead",
+        risk_level: editing.risk_level ?? "low",
+      });
+    }
+    if (!open) setF(BLANK);
+  }, [open, editing]);
+
   const save = async () => {
     if (!f.name.trim()) return toast.error("Nom requis");
     setBusy(true);
