@@ -13,7 +13,6 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
-import { Route as AppInvoicesRouteImport } from './routes/_app/invoices'
 import { Route as AppFollowUpsRouteImport } from './routes/_app/follow-ups'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCustomersRouteImport } from './routes/_app/customers'
@@ -38,11 +37,6 @@ const IndexRoute = IndexRouteImport.update({
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppInvoicesRoute = AppInvoicesRouteImport.update({
-  id: '/invoices',
-  path: '/invoices',
   getParentRoute: () => AppRoute,
 } as any)
 const AppFollowUpsRoute = AppFollowUpsRouteImport.update({
@@ -82,7 +76,6 @@ export interface FileRoutesByFullPath {
   '/customers': typeof AppCustomersRoute
   '/dashboard': typeof AppDashboardRoute
   '/follow-ups': typeof AppFollowUpsRoute
-  '/invoices': typeof AppInvoicesRoute
   '/settings': typeof AppSettingsRoute
   '/quotes/$id': typeof AppQuotesIdRoute
   '/quotes/new': typeof AppQuotesNewRoute
@@ -94,7 +87,6 @@ export interface FileRoutesByTo {
   '/customers': typeof AppCustomersRoute
   '/dashboard': typeof AppDashboardRoute
   '/follow-ups': typeof AppFollowUpsRoute
-  '/invoices': typeof AppInvoicesRoute
   '/settings': typeof AppSettingsRoute
   '/quotes/$id': typeof AppQuotesIdRoute
   '/quotes/new': typeof AppQuotesNewRoute
@@ -108,7 +100,6 @@ export interface FileRoutesById {
   '/_app/customers': typeof AppCustomersRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/follow-ups': typeof AppFollowUpsRoute
-  '/_app/invoices': typeof AppInvoicesRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/quotes/$id': typeof AppQuotesIdRoute
   '/_app/quotes/new': typeof AppQuotesNewRoute
@@ -122,7 +113,6 @@ export interface FileRouteTypes {
     | '/customers'
     | '/dashboard'
     | '/follow-ups'
-    | '/invoices'
     | '/settings'
     | '/quotes/$id'
     | '/quotes/new'
@@ -134,7 +124,6 @@ export interface FileRouteTypes {
     | '/customers'
     | '/dashboard'
     | '/follow-ups'
-    | '/invoices'
     | '/settings'
     | '/quotes/$id'
     | '/quotes/new'
@@ -147,7 +136,6 @@ export interface FileRouteTypes {
     | '/_app/customers'
     | '/_app/dashboard'
     | '/_app/follow-ups'
-    | '/_app/invoices'
     | '/_app/settings'
     | '/_app/quotes/$id'
     | '/_app/quotes/new'
@@ -188,13 +176,6 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AppSettingsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/invoices': {
-      id: '/_app/invoices'
-      path: '/invoices'
-      fullPath: '/invoices'
-      preLoaderRoute: typeof AppInvoicesRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/follow-ups': {
@@ -246,7 +227,6 @@ interface AppRouteChildren {
   AppCustomersRoute: typeof AppCustomersRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppFollowUpsRoute: typeof AppFollowUpsRoute
-  AppInvoicesRoute: typeof AppInvoicesRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppQuotesIdRoute: typeof AppQuotesIdRoute
   AppQuotesNewRoute: typeof AppQuotesNewRoute
@@ -257,7 +237,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppCustomersRoute: AppCustomersRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppFollowUpsRoute: AppFollowUpsRoute,
-  AppInvoicesRoute: AppInvoicesRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppQuotesIdRoute: AppQuotesIdRoute,
   AppQuotesNewRoute: AppQuotesNewRoute,
@@ -274,3 +253,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
