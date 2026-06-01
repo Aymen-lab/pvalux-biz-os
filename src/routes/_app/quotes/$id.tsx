@@ -97,9 +97,38 @@ function QuoteDetail() {
           </Select>
           <Button variant="outline" onClick={whatsappMsg}><MessageCircle className="size-4 mr-2" />WhatsApp</Button>
           <Button variant="outline" onClick={() => window.print()}><Printer className="size-4 mr-2" />Imprimer / PDF</Button>
-          <Button onClick={convertToInvoice}><FileCheck className="size-4 mr-2" />Convertir en facture</Button>
+          <Button onClick={openConvert}><FileCheck className="size-4 mr-2" />Convertir en facture</Button>
         </div>
       </div>
+
+      <Dialog open={convertOpen} onOpenChange={setConvertOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Convertir en facture</DialogTitle></DialogHeader>
+          <div className="grid gap-3">
+            <p className="text-sm text-muted-foreground">
+              Une facture sera créée pour {formatTND(q.total)} au nom de {q.customers?.name}.
+            </p>
+            <div>
+              <Label>Date d'échéance</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !dueDate && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-2 size-4" />
+                    {dueDate ? format(dueDate, "dd/MM/yyyy", { locale: fr }) : "Sélectionner"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={dueDate} onSelect={(d) => d && setDueDate(d)} initialFocus className={cn("p-3 pointer-events-auto")} />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConvertOpen(false)}>Annuler</Button>
+            <Button onClick={convertToInvoice} disabled={converting}>{converting ? "Création…" : "Créer la facture"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Card className="print-area">
         <CardContent className="p-8 space-y-6">
