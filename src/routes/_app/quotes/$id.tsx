@@ -31,6 +31,10 @@ function QuoteDetail() {
   const cid = profile?.company_id;
   const qc = useQueryClient();
   const nav = useNavigate();
+  const [convertOpen, setConvertOpen] = useState(false);
+  const defaultDue = new Date(); defaultDue.setDate(defaultDue.getDate() + 30);
+  const [dueDate, setDueDate] = useState<Date>(defaultDue);
+  const [converting, setConverting] = useState(false);
 
   const { data } = useQuery({
     queryKey: ["quote", id],
