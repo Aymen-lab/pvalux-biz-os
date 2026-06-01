@@ -55,7 +55,7 @@ function CustomersPage() {
         <Input placeholder="Rechercher par nom ou téléphone…" value={q} onChange={(e) => setQ(e.target.value)} className="sm:max-w-sm" />
         <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setEditing(null); }}>
           <DialogTrigger asChild><Button><Plus className="size-4 mr-2" />Nouveau client</Button></DialogTrigger>
-          <CustomerDialog cid={cid!} editing={editing} onSaved={() => { setOpen(false); setEditing(null); refresh(); }} />
+          <CustomerDialog cid={cid!} editing={editing} open={open} onSaved={() => { setOpen(false); setEditing(null); refresh(); }} />
         </Dialog>
       </div>
 
