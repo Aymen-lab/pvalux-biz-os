@@ -2,12 +2,20 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 import { formatTND, formatDate, PRODUCT_TYPES, UNITS, genNumber } from "@/lib/format";
-import { Printer, MessageCircle, ArrowLeft, FileCheck } from "lucide-react";
+import { Printer, MessageCircle, ArrowLeft, FileCheck, CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/quotes/$id")({
@@ -23,6 +31,10 @@ function QuoteDetail() {
   const cid = profile?.company_id;
   const qc = useQueryClient();
   const nav = useNavigate();
+  const [convertOpen, setConvertOpen] = useState(false);
+  const defaultDue = new Date(); defaultDue.setDate(defaultDue.getDate() + 30);
+  const [dueDate, setDueDate] = useState<Date>(defaultDue);
+  const [converting, setConverting] = useState(false);
 
   const { data } = useQuery({
     queryKey: ["quote", id],
@@ -53,16 +65,24 @@ function QuoteDetail() {
     window.open(url, "_blank");
   };
 
-  const convertToInvoice = async () => {
+  const openConvert = () => {
     if (q.status !== "accepted") return toast.error("Marquez le devis comme accepté d'abord");
-    const due = new Date(); due.setDate(due.getDate() + 30);
-    const { data: inv, error } = await supabase.from("invoices").insert({
+    const d = new Date(); d.setDate(d.getDate() + 30);
+    setDueDate(d);
+    setConvertOpen(true);
+  };
+
+  const convertToInvoice = async () => {
+    setConverting(true);
+    const { error } = await supabase.from("invoices").insert({
       company_id: cid!, quote_id: q.id, customer_id: q.customer_id,
-      invoice_number: genNumber("FAC"), due_date: due.toISOString().slice(0, 10),
+      invoice_number: genNumber("FAC"), due_date: format(dueDate, "yyyy-MM-dd"),
       total: q.total, balance: q.total, paid: 0, status: "unpaid",
     }).select().single();
+    setConverting(false);
     if (error) return toast.error(error.message);
     toast.success("Facture créée");
+    setConvertOpen(false);
     nav({ to: "/invoices" });
   };
 
@@ -77,9 +97,38 @@ function QuoteDetail() {
           </Select>
           <Button variant="outline" onClick={whatsappMsg}><MessageCircle className="size-4 mr-2" />WhatsApp</Button>
           <Button variant="outline" onClick={() => window.print()}><Printer className="size-4 mr-2" />Imprimer / PDF</Button>
-          <Button onClick={convertToInvoice}><FileCheck className="size-4 mr-2" />Convertir en facture</Button>
+          <Button onClick={openConvert}><FileCheck className="size-4 mr-2" />Convertir en facture</Button>
         </div>
       </div>
+
+      <Dialog open={convertOpen} onOpenChange={setConvertOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Convertir en facture</DialogTitle></DialogHeader>
+          <div className="grid gap-3">
+            <p className="text-sm text-muted-foreground">
+              Une facture sera créée pour {formatTND(q.total)} au nom de {q.customers?.name}.
+            </p>
+            <div>
+              <Label>Date d'échéance</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !dueDate && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-2 size-4" />
+                    {dueDate ? format(dueDate, "dd/MM/yyyy", { locale: fr }) : "Sélectionner"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={dueDate} onSelect={(d) => d && setDueDate(d)} initialFocus className={cn("p-3 pointer-events-auto")} />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConvertOpen(false)}>Annuler</Button>
+            <Button onClick={convertToInvoice} disabled={converting}>{converting ? "Création…" : "Créer la facture"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Card className="print-area">
         <CardContent className="p-8 space-y-6">
