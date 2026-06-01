@@ -65,16 +65,24 @@ function QuoteDetail() {
     window.open(url, "_blank");
   };
 
-  const convertToInvoice = async () => {
+  const openConvert = () => {
     if (q.status !== "accepted") return toast.error("Marquez le devis comme accepté d'abord");
-    const due = new Date(); due.setDate(due.getDate() + 30);
-    const { data: inv, error } = await supabase.from("invoices").insert({
+    const d = new Date(); d.setDate(d.getDate() + 30);
+    setDueDate(d);
+    setConvertOpen(true);
+  };
+
+  const convertToInvoice = async () => {
+    setConverting(true);
+    const { error } = await supabase.from("invoices").insert({
       company_id: cid!, quote_id: q.id, customer_id: q.customer_id,
-      invoice_number: genNumber("FAC"), due_date: due.toISOString().slice(0, 10),
+      invoice_number: genNumber("FAC"), due_date: format(dueDate, "yyyy-MM-dd"),
       total: q.total, balance: q.total, paid: 0, status: "unpaid",
     }).select().single();
+    setConverting(false);
     if (error) return toast.error(error.message);
     toast.success("Facture créée");
+    setConvertOpen(false);
     nav({ to: "/invoices" });
   };
 
