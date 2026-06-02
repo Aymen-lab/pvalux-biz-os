@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CATEGORIES, PRODUCT_TYPES, UNITS, formatTND, genNumber, lineTotal } from "@/lib/format";
+import { CATEGORIES, PRODUCT_TYPES, UNITS, formatTND, lineTotal } from "@/lib/format";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -60,20 +60,34 @@ function NewQuote() {
   const save = async () => {
     if (!customerId) return toast.error("Sélectionnez un client");
     if (!cid) return;
+    if (lines.length === 0) return toast.error("Ajoutez au moins une ligne");
     setBusy(true);
     try {
-      const number = genNumber("DEV");
-      const { data: quote, error } = await supabase.from("quotes").insert({
-        company_id: cid, customer_id: customerId, quote_number: number, project_name: project,
-        subtotal: totals.subtotal, discount, transport, installation, tax_rate: taxRate,
-        tax_amount: totals.taxAmount, total: totals.total, notes, conditions, created_by: user?.id,
-      }).select().single();
+      const { data, error } = await supabase.rpc("create_quote_with_lines", {
+        _company_id: cid,
+        _customer_id: customerId,
+        _project_name: project || null,
+        _discount: Number(discount) || 0,
+        _transport: Number(transport) || 0,
+        _installation: Number(installation) || 0,
+        _tax_rate: Number(taxRate) || 0,
+        _notes: notes || null,
+        _conditions: conditions || null,
+        _lines: lines.map((l) => ({
+          category: l.category,
+          product_type: l.product_type,
+          description: l.description,
+          width: l.width,
+          height: l.height,
+          quantity: l.quantity,
+          unit: l.unit,
+          unit_price: l.unit_price,
+        })) as any,
+      });
       if (error) throw error;
-      const linesPayload = lines.map((l, i) => ({ ...l, quote_id: quote.id, total: totals.lineTotals[i], position: i }));
-      const { error: e2 } = await supabase.from("quote_lines").insert(linesPayload as any);
-      if (e2) throw e2;
-      toast.success("Devis créé");
-      nav({ to: "/quotes/$id", params: { id: quote.id } });
+      const result = data as { id: string; quote_number: string };
+      toast.success(`Devis ${result.quote_number} créé`);
+      nav({ to: "/quotes/$id", params: { id: result.id } });
     } catch (e: any) { toast.error(e.message); } finally { setBusy(false); }
   };
 

@@ -61,7 +61,7 @@ function InvoiceDetail() {
 
   const confirmDelete = async () => {
     if (!deletePayment) return;
-    const { error } = await supabase.from("payments").delete().eq("id", deletePayment.id);
+    const { error } = await supabase.rpc("delete_payment", { _payment_id: deletePayment.id });
     if (error) return toast.error(error.message);
     toast.success("Paiement supprimé");
     qc.invalidateQueries({ queryKey: ["invoice", id] });

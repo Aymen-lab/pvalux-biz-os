@@ -8,6 +8,11 @@ export function formatDate(d: string | Date | null | undefined) {
   return new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
 }
 
+/**
+ * @deprecated Document numbers are now issued by the database
+ * (generate_document_number RPC) so they are concurrency-safe and per-company.
+ * Kept only as a fallback for legacy callers; do NOT use for new quotes or invoices.
+ */
 export function genNumber(prefix: string) {
   const d = new Date();
   const stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}-${String(d.getHours()).padStart(2, "0")}${String(d.getMinutes()).padStart(2, "0")}`;

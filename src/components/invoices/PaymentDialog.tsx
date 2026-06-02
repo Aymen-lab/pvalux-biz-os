@@ -76,8 +76,12 @@ export function PaymentDialog({ invoice, payment, open, onOpenChange, onSuccess 
     setBusy(true);
     const paid_at = format(paidAt, "yyyy-MM-dd");
     const { error: err } = isEdit
-      ? await supabase.from("payments").update({ amount, paid_at, method, notes: note }).eq("id", payment!.id)
-      : await supabase.from("payments").insert({ invoice_id: invoice.id, amount, paid_at, method, notes: note });
+      ? await supabase.rpc("update_payment", {
+          _payment_id: payment!.id, _amount: amount, _paid_at: paid_at, _method: method, _notes: note,
+        })
+      : await supabase.rpc("create_payment", {
+          _invoice_id: invoice.id, _amount: amount, _paid_at: paid_at, _method: method, _notes: note,
+        });
     setBusy(false);
     if (err) return toast.error(err.message);
     toast.success("Paiement enregistré");

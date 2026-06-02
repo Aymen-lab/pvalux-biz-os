@@ -14,7 +14,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { formatTND, formatDate, PRODUCT_TYPES, UNITS, genNumber } from "@/lib/format";
+import { formatTND, formatDate, PRODUCT_TYPES, UNITS } from "@/lib/format";
 import { Printer, MessageCircle, ArrowLeft, FileCheck, CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 
@@ -74,14 +74,14 @@ function QuoteDetail() {
 
   const convertToInvoice = async () => {
     setConverting(true);
-    const { error } = await supabase.from("invoices").insert({
-      company_id: cid!, quote_id: q.id, customer_id: q.customer_id,
-      invoice_number: genNumber("FAC"), due_date: format(dueDate, "yyyy-MM-dd"),
-      total: q.total, balance: q.total, paid: 0, status: "unpaid",
-    }).select().single();
+    const { data, error } = await supabase.rpc("convert_quote_to_invoice", {
+      _quote_id: q.id,
+      _due_date: format(dueDate, "yyyy-MM-dd"),
+    });
     setConverting(false);
     if (error) return toast.error(error.message);
-    toast.success("Facture créée");
+    const result = data as { id: string; invoice_number: string };
+    toast.success(`Facture ${result.invoice_number} créée`);
     setConvertOpen(false);
     nav({ to: "/invoices" });
   };
