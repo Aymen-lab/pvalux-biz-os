@@ -102,8 +102,8 @@ function Onboarding({ onDone }: { onDone: () => Promise<void> }) {
     try {
       const { data, error } = await supabase.rpc("create_company_onboarding", {
         _name: name,
-        _phone: phone || null,
-        _address: address || null,
+        _phone: phone || undefined,
+        _address: address || undefined,
       });
       if (error) {
         console.error("[onboarding] rpc failed", error);

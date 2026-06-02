@@ -66,13 +66,13 @@ function NewQuote() {
       const { data, error } = await supabase.rpc("create_quote_with_lines", {
         _company_id: cid,
         _customer_id: customerId,
-        _project_name: project || null,
+        _project_name: project || "",
         _discount: Number(discount) || 0,
         _transport: Number(transport) || 0,
         _installation: Number(installation) || 0,
         _tax_rate: Number(taxRate) || 0,
-        _notes: notes || null,
-        _conditions: conditions || null,
+        _notes: notes || "",
+        _conditions: conditions || "",
         _lines: lines.map((l) => ({
           category: l.category,
           product_type: l.product_type,
