@@ -109,6 +109,36 @@ export type Database = {
           },
         ]
       }
+      document_counters: {
+        Row: {
+          company_id: string
+          created_at: string
+          document_type: string
+          id: string
+          next_number: number
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          document_type: string
+          id?: string
+          next_number?: number
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          document_type?: string
+          id?: string
+          next_number?: number
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
       follow_ups: {
         Row: {
           channel: string
@@ -474,7 +504,49 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assert_company_member: {
+        Args: { _company_id: string }
+        Returns: undefined
+      }
+      convert_quote_to_invoice: {
+        Args: { _due_date: string; _quote_id: string }
+        Returns: Json
+      }
+      create_company_onboarding: {
+        Args: { _address?: string; _name: string; _phone?: string }
+        Returns: string
+      }
+      create_payment: {
+        Args: {
+          _amount: number
+          _invoice_id: string
+          _method: string
+          _notes: string
+          _paid_at: string
+        }
+        Returns: string
+      }
+      create_quote_with_lines: {
+        Args: {
+          _company_id: string
+          _conditions: string
+          _customer_id: string
+          _discount: number
+          _installation: number
+          _lines: Json
+          _notes: string
+          _project_name: string
+          _tax_rate: number
+          _transport: number
+        }
+        Returns: Json
+      }
       current_company_id: { Args: never; Returns: string }
+      delete_payment: { Args: { _payment_id: string }; Returns: undefined }
+      generate_document_number: {
+        Args: { _company_id: string; _document_type: string }
+        Returns: string
+      }
       has_role: {
         Args: {
           _company_id: string
@@ -482,6 +554,16 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      update_payment: {
+        Args: {
+          _amount: number
+          _method: string
+          _notes: string
+          _paid_at: string
+          _payment_id: string
+        }
+        Returns: undefined
       }
     }
     Enums: {

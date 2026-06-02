@@ -100,46 +100,16 @@ function Onboarding({ onDone }: { onDone: () => Promise<void> }) {
     if (!name.trim()) return;
     setBusy(true);
     try {
-      // 1. Re-verify authenticated user
-      const { data: userData, error: userErr } = await supabase.auth.getUser();
-      if (userErr || !userData.user) {
-        console.error("[onboarding] getUser failed", userErr);
-        throw new Error("Session expirée. Reconnectez-vous.");
+      const { data, error } = await supabase.rpc("create_company_onboarding", {
+        _name: name,
+        _phone: phone || undefined,
+        _address: address || undefined,
+      });
+      if (error) {
+        console.error("[onboarding] rpc failed", error);
+        throw new Error(error.message);
       }
-      const uid = userData.user.id;
-
-      // 2. Insert company with owner_id = uid
-      const { data: company, error: companyErr } = await supabase
-        .from("companies")
-        .insert({ name, phone, address, email: userData.user.email, owner_id: uid })
-        .select()
-        .single();
-      if (companyErr || !company) {
-        console.error("[onboarding] company insert failed", companyErr);
-        throw new Error(`Création entreprise: ${companyErr?.message ?? "inconnue"}`);
-      }
-
-      // 3. Insert owner role
-      const { error: roleErr } = await supabase
-        .from("user_roles")
-        .insert({ user_id: uid, company_id: company.id, role: "owner" })
-        .select()
-        .single();
-      if (roleErr) {
-        console.error("[onboarding] user_roles insert failed", roleErr);
-        throw new Error(`Attribution rôle: ${roleErr.message}`);
-      }
-
-      // 4. Update profile.company_id
-      const { error: profileErr } = await supabase
-        .from("profiles")
-        .update({ company_id: company.id })
-        .eq("id", uid);
-      if (profileErr) {
-        console.error("[onboarding] profile update failed", profileErr);
-        throw new Error(`Mise à jour profil: ${profileErr.message}`);
-      }
-
+      console.log("[onboarding] company created", data);
       toast.success("Entreprise créée !");
       await onDone();
     } catch (e: any) {
