@@ -80,6 +80,9 @@ function InvoiceDetail() {
           <Badge className={STATUS[effectiveStatus]?.cls}>{STATUS[effectiveStatus]?.label}</Badge>
         </div>
         <div className="flex gap-2 flex-wrap">
+          <Link to="/invoices/$id/edit" params={{ id: inv.id }}>
+            <Button variant="outline"><Pencil className="size-4 mr-2" />Modifier</Button>
+          </Link>
           <Button variant="outline" onClick={() => window.print()}>
             <Printer className="size-4 mr-2" />PDF
           </Button>
