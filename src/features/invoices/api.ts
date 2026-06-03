@@ -14,7 +14,7 @@ export async function fetchInvoice(id: string) {
 export async function updateInvoice(id: string, v: InvoiceEditValues) {
   const { data, error } = await supabase.rpc("update_invoice", {
     _invoice_id: id,
-    _due_date: v.due_date,
+    _due_date: v.due_date as any,
     _notes: v.notes,
   });
   if (error) throw error;
