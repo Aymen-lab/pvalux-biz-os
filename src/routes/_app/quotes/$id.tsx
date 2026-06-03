@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { formatTND, formatDate, PRODUCT_TYPES, UNITS } from "@/lib/format";
-import { Printer, MessageCircle, ArrowLeft, FileCheck, CalendarIcon } from "lucide-react";
+import { Printer, MessageCircle, ArrowLeft, FileCheck, CalendarIcon, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/quotes/$id")({
@@ -95,6 +95,9 @@ function QuoteDetail() {
             <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
             <SelectContent>{Object.entries(STATUSES).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
           </Select>
+          <Link to="/quotes/$id/edit" params={{ id: q.id }}>
+            <Button variant="outline"><Pencil className="size-4 mr-2" />Modifier</Button>
+          </Link>
           <Button variant="outline" onClick={whatsappMsg}><MessageCircle className="size-4 mr-2" />WhatsApp</Button>
           <Button variant="outline" onClick={() => window.print()}><Printer className="size-4 mr-2" />Imprimer / PDF</Button>
           <Button onClick={openConvert}><FileCheck className="size-4 mr-2" />Convertir en facture</Button>
