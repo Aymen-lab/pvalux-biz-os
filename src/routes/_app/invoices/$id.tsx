@@ -132,6 +132,12 @@ function InvoiceDetail() {
             ) : "—"}
           </div>
         </div>
+        {inv.notes && (
+          <div className="pt-2 border-t mt-2">
+            <div className="text-xs text-muted-foreground mb-1">Notes</div>
+            <div className="whitespace-pre-line">{inv.notes}</div>
+          </div>
+        )}
       </CardContent></Card>
 
       {/* Payments */}
