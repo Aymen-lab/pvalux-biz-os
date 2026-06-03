@@ -211,6 +211,7 @@ export type Database = {
           due_date: string | null
           id: string
           invoice_number: string
+          notes: string | null
           paid: number
           quote_id: string | null
           status: Database["public"]["Enums"]["invoice_status"]
@@ -225,6 +226,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           invoice_number: string
+          notes?: string | null
           paid?: number
           quote_id?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
@@ -239,6 +241,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           invoice_number?: string
+          notes?: string | null
           paid?: number
           quote_id?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
@@ -555,6 +558,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      update_invoice: {
+        Args: { _due_date: string; _invoice_id: string; _notes: string }
+        Returns: Json
+      }
       update_payment: {
         Args: {
           _amount: number
@@ -564,6 +571,21 @@ export type Database = {
           _payment_id: string
         }
         Returns: undefined
+      }
+      update_quote_with_lines: {
+        Args: {
+          _conditions: string
+          _customer_id: string
+          _discount: number
+          _installation: number
+          _lines: Json
+          _notes: string
+          _project_name: string
+          _quote_id: string
+          _tax_rate: number
+          _transport: number
+        }
+        Returns: Json
       }
     }
     Enums: {
