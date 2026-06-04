@@ -20,6 +20,7 @@ import { Route as AppQuotesIndexRouteImport } from './routes/_app/quotes/index'
 import { Route as AppInvoicesIndexRouteImport } from './routes/_app/invoices/index'
 import { Route as AppQuotesNewRouteImport } from './routes/_app/quotes/new'
 import { Route as AppQuotesIdRouteImport } from './routes/_app/quotes/$id'
+import { Route as AppInvoicesIdRouteImport } from './routes/_app/invoices/$id'
 import { Route as AppQuotesIdIndexRouteImport } from './routes/_app/quotes/$id.index'
 import { Route as AppInvoicesIdIndexRouteImport } from './routes/_app/invoices/$id.index'
 import { Route as AppQuotesIdEditRouteImport } from './routes/_app/quotes/$id.edit'
@@ -79,15 +80,20 @@ const AppQuotesIdRoute = AppQuotesIdRouteImport.update({
   path: '/quotes/$id',
   getParentRoute: () => AppRoute,
 } as any)
+const AppInvoicesIdRoute = AppInvoicesIdRouteImport.update({
+  id: '/invoices/$id',
+  path: '/invoices/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppQuotesIdIndexRoute = AppQuotesIdIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppQuotesIdRoute,
 } as any)
 const AppInvoicesIdIndexRoute = AppInvoicesIdIndexRouteImport.update({
-  id: '/invoices/$id/',
-  path: '/invoices/$id/',
-  getParentRoute: () => AppRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppInvoicesIdRoute,
 } as any)
 const AppQuotesIdEditRoute = AppQuotesIdEditRouteImport.update({
   id: '/edit',
@@ -95,9 +101,9 @@ const AppQuotesIdEditRoute = AppQuotesIdEditRouteImport.update({
   getParentRoute: () => AppQuotesIdRoute,
 } as any)
 const AppInvoicesIdEditRoute = AppInvoicesIdEditRouteImport.update({
-  id: '/invoices/$id/edit',
-  path: '/invoices/$id/edit',
-  getParentRoute: () => AppRoute,
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => AppInvoicesIdRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AppDashboardRoute
   '/follow-ups': typeof AppFollowUpsRoute
   '/settings': typeof AppSettingsRoute
+  '/invoices/$id': typeof AppInvoicesIdRouteWithChildren
   '/quotes/$id': typeof AppQuotesIdRouteWithChildren
   '/quotes/new': typeof AppQuotesNewRoute
   '/invoices/': typeof AppInvoicesIndexRoute
@@ -140,6 +147,7 @@ export interface FileRoutesById {
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/follow-ups': typeof AppFollowUpsRoute
   '/_app/settings': typeof AppSettingsRoute
+  '/_app/invoices/$id': typeof AppInvoicesIdRouteWithChildren
   '/_app/quotes/$id': typeof AppQuotesIdRouteWithChildren
   '/_app/quotes/new': typeof AppQuotesNewRoute
   '/_app/invoices/': typeof AppInvoicesIndexRoute
@@ -158,6 +166,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/follow-ups'
     | '/settings'
+    | '/invoices/$id'
     | '/quotes/$id'
     | '/quotes/new'
     | '/invoices/'
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/_app/dashboard'
     | '/_app/follow-ups'
     | '/_app/settings'
+    | '/_app/invoices/$id'
     | '/_app/quotes/$id'
     | '/_app/quotes/new'
     | '/_app/invoices/'
@@ -285,6 +295,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppQuotesIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/invoices/$id': {
+      id: '/_app/invoices/$id'
+      path: '/invoices/$id'
+      fullPath: '/invoices/$id'
+      preLoaderRoute: typeof AppInvoicesIdRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/quotes/$id/': {
       id: '/_app/quotes/$id/'
       path: '/'
@@ -294,10 +311,10 @@ declare module '@tanstack/react-router' {
     }
     '/_app/invoices/$id/': {
       id: '/_app/invoices/$id/'
-      path: '/invoices/$id'
+      path: '/'
       fullPath: '/invoices/$id/'
       preLoaderRoute: typeof AppInvoicesIdIndexRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppInvoicesIdRoute
     }
     '/_app/quotes/$id/edit': {
       id: '/_app/quotes/$id/edit'
@@ -308,13 +325,27 @@ declare module '@tanstack/react-router' {
     }
     '/_app/invoices/$id/edit': {
       id: '/_app/invoices/$id/edit'
-      path: '/invoices/$id/edit'
+      path: '/edit'
       fullPath: '/invoices/$id/edit'
       preLoaderRoute: typeof AppInvoicesIdEditRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppInvoicesIdRoute
     }
   }
 }
+
+interface AppInvoicesIdRouteChildren {
+  AppInvoicesIdEditRoute: typeof AppInvoicesIdEditRoute
+  AppInvoicesIdIndexRoute: typeof AppInvoicesIdIndexRoute
+}
+
+const AppInvoicesIdRouteChildren: AppInvoicesIdRouteChildren = {
+  AppInvoicesIdEditRoute: AppInvoicesIdEditRoute,
+  AppInvoicesIdIndexRoute: AppInvoicesIdIndexRoute,
+}
+
+const AppInvoicesIdRouteWithChildren = AppInvoicesIdRoute._addFileChildren(
+  AppInvoicesIdRouteChildren,
+)
 
 interface AppQuotesIdRouteChildren {
   AppQuotesIdEditRoute: typeof AppQuotesIdEditRoute
@@ -335,12 +366,11 @@ interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppFollowUpsRoute: typeof AppFollowUpsRoute
   AppSettingsRoute: typeof AppSettingsRoute
+  AppInvoicesIdRoute: typeof AppInvoicesIdRouteWithChildren
   AppQuotesIdRoute: typeof AppQuotesIdRouteWithChildren
   AppQuotesNewRoute: typeof AppQuotesNewRoute
   AppInvoicesIndexRoute: typeof AppInvoicesIndexRoute
   AppQuotesIndexRoute: typeof AppQuotesIndexRoute
-  AppInvoicesIdEditRoute: typeof AppInvoicesIdEditRoute
-  AppInvoicesIdIndexRoute: typeof AppInvoicesIdIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -348,12 +378,11 @@ const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppFollowUpsRoute: AppFollowUpsRoute,
   AppSettingsRoute: AppSettingsRoute,
+  AppInvoicesIdRoute: AppInvoicesIdRouteWithChildren,
   AppQuotesIdRoute: AppQuotesIdRouteWithChildren,
   AppQuotesNewRoute: AppQuotesNewRoute,
   AppInvoicesIndexRoute: AppInvoicesIndexRoute,
   AppQuotesIndexRoute: AppQuotesIndexRoute,
-  AppInvoicesIdEditRoute: AppInvoicesIdEditRoute,
-  AppInvoicesIdIndexRoute: AppInvoicesIdIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
