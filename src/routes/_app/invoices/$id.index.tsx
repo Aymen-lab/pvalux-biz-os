@@ -15,7 +15,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { PaymentDialog, type PaymentRecord } from "@/components/invoices/PaymentDialog";
 
-export const Route = createFileRoute("/_app/invoices/$id")({
+export const Route = createFileRoute("/_app/invoices/$id/")({
   head: () => ({ meta: [{ title: "Facture — PVALUX" }] }),
   component: InvoiceDetail,
 });
